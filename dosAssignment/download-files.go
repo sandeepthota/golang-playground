@@ -13,6 +13,7 @@ import (
 
 	//	"stopwatch" //for timing download function
 	"sync" //for wait group
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -77,9 +78,28 @@ func main() {
 		go downloadFromUrl(listUrl[i])
 	}*/
 
-	singleThreadDownload(listUrl)
+	var n = 10
 
-	multiThreadDownload(listUrl)
+	startTime := time.Now().UTC()
+	for i := 0; i < n; i++ {
+		singleThreadDownload(listUrl)
+	}
+	endTime := time.Now().UTC()
+	var duration1 = endTime.Sub(startTime).Nanoseconds() / 1e9
+
+	startTime2 := time.Now().UTC()
+	for i := 0; i < n; i++ {
+		multiThreadDownload(listUrl)
+	}
 
 	wg.Wait()
+
+	endTime2 := time.Now().UTC()
+	println("ss")
+
+	var duration2 = endTime2.Sub(startTime2).Nanoseconds() / 1e9
+
+	fmt.Printf("Time taken in seconds for single threaded downloads : %v\n", duration1)
+	fmt.Printf("Time taken in seconds for multi threaded downloads  : %v\n", duration2)
+
 }
