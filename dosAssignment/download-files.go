@@ -1,6 +1,13 @@
-//http://nathanleclaire.com/blog/2014/02/15/how-to-wait-for-all-goroutines-to-finish-executing-before-continuing/
-//http://stackoverflow.com/questions/8350609/how-do-you-time-a-function-in-go-and-return-its-runtime-in-milliseconds
-//https://github.com/bradhe/stopwatch
+/*
+Some websites cap maximum speed of a connection, hence even if you have higher bandwith, your actual download speed might be lower than your max possible speed. In such ascenario we can use a different thread for each file to be downloaded and imporove our overall speed. In this program, go routines are used to concurrently download files from a list of urls provided.
+
+References :
+http://nathanleclaire.com/blog/2014/02/15/how-to-wait-for-all-goroutines-to-finish-executing-before-continuing/
+http://stackoverflow.com/questions/8350609/how-do-you-time-a-function-in-go-and-return-its-runtime-in-milliseconds
+
+Sample Output : http://showterm.io/ad5ff73e59867afbb888c
+
+*/
 
 package main
 
@@ -18,7 +25,7 @@ import (
 
 var wg sync.WaitGroup
 
-func downloadFromUrl(url string, isMultiThread bool) {
+func downloadFromUrl(url string, isMultiThread bool) { //reference : https://github.com/thbar/golang-playground/blob/master/download-files.go
 	if isMultiThread {
 		defer wg.Done()
 	}
@@ -27,7 +34,6 @@ func downloadFromUrl(url string, isMultiThread bool) {
 	fileName := tokens[len(tokens)-1]
 	fmt.Println("Downloading", url, "to", fileName)
 
-	// TODO: check file existence first with io.IsExist
 	output, err := os.Create(fileName)
 	if err != nil {
 		fmt.Println("Error while creating", fileName, "-", err)
@@ -65,41 +71,25 @@ func multiThreadDownload(urlList []string) {
 }
 
 func main() {
-	/*countries := []string{"GB", "FR", "ES", "DE", "CN", "CA", "ID", "US"}
-	for i := 0; i < len(countries); i++ {
-		url := "http://download.geonames.org/export/dump/" + countries[i] + ".zip"
-		downloadFromUrl(url)
-	}*/
+
+	fmt.Println("Starting sample downloads to show speed difference.")
 
 	listUrl := []string{"http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm1.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm2part1.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm2part2.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part1.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part2.pdf"}
 
-	/*for i := 0; i < len(listUrl); i++ {
-		wg.Add(0)
-		go downloadFromUrl(listUrl[i])
-	}*/
-
-	var n = 10
-
 	startTime := time.Now().UTC()
-	for i := 0; i < n; i++ {
-		singleThreadDownload(listUrl)
-	}
+	singleThreadDownload(listUrl)
 	endTime := time.Now().UTC()
-	var duration1 = endTime.Sub(startTime).Nanoseconds() / 1e9
+	var duration1 = endTime.Sub(startTime).Nanoseconds() / 1e6
 
 	startTime2 := time.Now().UTC()
-	for i := 0; i < n; i++ {
-		multiThreadDownload(listUrl)
-	}
+	multiThreadDownload(listUrl)
 
 	wg.Wait()
 
 	endTime2 := time.Now().UTC()
-	println("ss")
+	var duration2 = endTime2.Sub(startTime2).Nanoseconds() / 1e6
 
-	var duration2 = endTime2.Sub(startTime2).Nanoseconds() / 1e9
-
-	fmt.Printf("Time taken in seconds for single threaded downloads : %v\n", duration1)
-	fmt.Printf("Time taken in seconds for multi threaded downloads  : %v\n", duration2)
+	fmt.Printf("Time taken in milliseconds for single threaded downloads : %v\n", duration1)
+	fmt.Printf("Time taken in milliseconds for multi threaded downloads  : %v\n", duration2)
 
 }
