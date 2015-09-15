@@ -11,8 +11,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bradhe/stopwatch" //for timing download function
-	"sync"                        //for wait group
+	//	"stopwatch" //for timing download function
+	"sync" //for wait group
 )
 
 var wg sync.WaitGroup
@@ -77,15 +77,9 @@ func main() {
 		go downloadFromUrl(listUrl[i])
 	}*/
 
-	start := stopWatch.Start()
 	singleThreadDownload(listUrl)
-	watch := stopWatch.Stop(start)
-	fmt.Printf("For single threaded download, time in milliseconds :  %v\n", watch.Milliseconds())
 
-	start := stopWatch.Start()
 	multiThreadDownload(listUrl)
-	watch := stopWatch.Stop(start)
-	fmt.Printf("For multi threaded download, time in milliseconds :  %v\n", watch.Milliseconds())
 
 	wg.Wait()
 }
