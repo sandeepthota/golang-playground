@@ -4,9 +4,9 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-
-	"golang.org/x/net/html"
+	"golang.org/x/net/html" //for parsing
+	"net/http"              //for crawler
+	"strings"               //for has prefix
 )
 
 //get href attribute from token
@@ -23,7 +23,9 @@ func getHref(t html.Token) (notPresent bool, href string) {
 
 //find links from webpage and display
 func findLinks(url string) {
-	resp, err := http.Get(url) //resp = response, err=error returned if any
+	baseURL := url[0 : strings.LastIndex(url, "/")+1] //extract base url of web page
+	fmt.Println(baseURL)                              // example : http://www.cise.ufl.edu/class/cis4930fa15idm/notes.html to http://www.cise.ufl.edu/class/cis4930fa15idm/
+	resp, err := http.Get(url)                        //resp = response, err=error returned if any
 
 	if err != nil {
 		fmt.Println("Error in crawling url : " + url)
@@ -53,6 +55,12 @@ func findLinks(url string) {
 			notPresent, url := getHref(t)
 			if notPresent {
 				continue
+			}
+
+			//convert link to aboslute link if relative
+			if !strings.HasPrefix(url, "http:") {
+				//	fmt.Println("Relative link found... Converting to absolute.")
+				url = baseURL + url //example notes/dm3part3.pdf to http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part2.pdf
 			}
 
 			fmt.Println("URL Found : " + url)
