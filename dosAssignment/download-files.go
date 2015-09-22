@@ -3,7 +3,6 @@ Some websites cap maximum speed of a connection, hence even if you have higher b
 
 References :
 http://nathanleclaire.com/blog/2014/02/15/how-to-wait-for-all-goroutines-to-finish-executing-before-continuing/
-http://stackoverflow.com/questions/8350609/how-do-you-time-a-function-in-go-and-return-its-runtime-in-milliseconds
 
 Sample Output : http://showterm.io/ad5ff73e59867afbb888c
 
@@ -18,7 +17,6 @@ import (
 	"os"
 	"strings"
 
-	//	"stopwatch" //for timing download function
 	"sync" //for wait group
 	"time"
 )
@@ -26,7 +24,7 @@ import (
 var wg sync.WaitGroup
 
 func downloadFromUrl(url string, isMultiThread bool) { //reference : https://github.com/thbar/golang-playground/blob/master/download-files.go
-	if isMultiThread {
+	if isMultiThread { //check if called by go routine or not
 		defer wg.Done()
 	}
 
@@ -76,20 +74,19 @@ func main() {
 
 	listUrl := []string{"http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm1.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm2part1.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm2part2.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part1.pdf", "http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part2.pdf"}
 
-	startTime := time.Now().UTC()
+	startTime := time.Now().UTC() //start timer
 	singleThreadDownload(listUrl)
-	endTime := time.Now().UTC()
+	endTime := time.Now().UTC() //stop timer
 	var duration1 = endTime.Sub(startTime).Nanoseconds() / 1e6
 
 	startTime2 := time.Now().UTC()
 	multiThreadDownload(listUrl)
 
-	wg.Wait()
+	wg.Wait() //wait for all go routines to finish
 
 	endTime2 := time.Now().UTC()
 	var duration2 = endTime2.Sub(startTime2).Nanoseconds() / 1e6
 
 	fmt.Printf("Time taken in milliseconds for single threaded downloads : %v\n", duration1)
 	fmt.Printf("Time taken in milliseconds for multi threaded downloads  : %v\n", duration2)
-
 }
