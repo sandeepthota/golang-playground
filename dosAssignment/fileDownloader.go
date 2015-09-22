@@ -1,6 +1,11 @@
 /*
 
-Run go get golang.org/x/net/html on command prompt to get html package. 
+File Downloader : Given link to a webpage and file type, this program will download all files of those extension(if any) present on the webpage. For each link found containing file of desired extension, a go routine is fired. This will ensure maximum throughput since some of the files found might be present on a slower server while others might be present on a faster server.
+
+Running Instructions :
+Run go get golang.org/x/net/html on command prompt first to get html package. The program takes url and file extension as command line arguments. So, to get all jpg files from https://www.reddit.com/r/pics you would type in go run fileDownloader.go https://www.reddit.com/r/pics jpg
+
+Sample Output : http://showterm.io/500cb9fee78a64d7f09e4
 
 */
 
@@ -8,16 +13,15 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/net/html" //for parsing. 
-	"net/http"              //for crawler
-	"strings"               //for has prefix
-	"sync" //for wait group
-	"os" //creating file
+	"golang.org/x/net/html" //for parsing.
 	"io"
+	"net/http" //for crawler
+	"os"       //creating file
+	"strings"  //for has prefix
+	"sync"     //for wait group
 )
 
 var wg sync.WaitGroup
-
 
 //get href attribute from token
 func getHref(t html.Token) (notPresent bool, href string) {
@@ -76,28 +80,17 @@ func findFiles(url string, extension string) { //[reference :  http://schier.co/
 				url = baseURL + url //example notes/dm3part3.pdf to http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part2.pdf
 			}
 
-			/*switch {
-			case fileExt == "pdf":
-				fmt.Println("PDF Found : " + url)
-
-			case fileExt == "ppt":
-				fmt.Println("PPT Found : " + url)
-
-
-			}*/
 			if fileExt == extension {
 				fmt.Println("File of ." + fileExt + " extension found : " + url)
 				wg.Add(1)
 				go downloadFromUrl(url)
 			}
-			//	fmt.Println(fileExt)
-			//	fmt.Println("URL Found : " + url)
 		}
 	}
 }
 
 func downloadFromUrl(url string) { //reference : https://github.com/thbar/golang-playground/blob/master/download-files.go
-	
+
 	defer wg.Done()
 
 	tokens := strings.Split(url, "/")
@@ -128,10 +121,6 @@ func downloadFromUrl(url string) { //reference : https://github.com/thbar/golang
 }
 
 func main() {
-	//extension := "pdf"
-	//findFiles("http://www.cise.ufl.edu/class/cis4930fa15idm/notes.html", extension)
-	//findFiles("https://www.reddit.com/r/aww", "jpg")
-	fmt.Println(os.Args[1])
-	findFiles(os.Args[1],os.Args[2])	
+	findFiles(os.Args[1], os.Args[2])
 	wg.Wait() //wait for all go routines to finish
 }
