@@ -19,12 +19,12 @@ func getHref(t html.Token) (notPresent bool, href string) {
 	return
 }
 
-//find links from webpage and display
-func findLinks(url string) { //[reference :  http://schier.co/blog/2015/04/26/a-simple-web-scraper-in-go.html]
+//find links to files which have specified extension
+func findFiles(url string, extension string) { //[reference :  http://schier.co/blog/2015/04/26/a-simple-web-scraper-in-go.html]
 
 	baseURL := url[0 : strings.LastIndex(url, "/")+1] //extract base url of web page
-	fmt.Println(baseURL)                              // example : http://www.cise.ufl.edu/class/cis4930fa15idm/notes.html to http://www.cise.ufl.edu/class/cis4930fa15idm/
-	resp, err := http.Get(url)                        //resp = response, err=error returned if any
+	//	fmt.Println(baseURL)                              // example : http://www.cise.ufl.edu/class/cis4930fa15idm/notes.html to http://www.cise.ufl.edu/class/cis4930fa15idm/
+	resp, err := http.Get(url) //resp = response, err=error returned if any
 
 	if err != nil {
 		fmt.Println("Error in crawling url : " + url)
@@ -64,12 +64,17 @@ func findLinks(url string) { //[reference :  http://schier.co/blog/2015/04/26/a-
 				url = baseURL + url //example notes/dm3part3.pdf to http://www.cise.ufl.edu/class/cis4930fa15idm/notes/dm3part2.pdf
 			}
 
-			switch {
+			/*switch {
 			case fileExt == "pdf":
 				fmt.Println("PDF Found : " + url)
 
 			case fileExt == "ppt":
 				fmt.Println("PPT Found : " + url)
+
+
+			}*/
+			if fileExt == extension {
+				fmt.Println("File of ." + fileExt + " extension found : " + url)
 			}
 			//	fmt.Println(fileExt)
 			//	fmt.Println("URL Found : " + url)
@@ -78,6 +83,7 @@ func findLinks(url string) { //[reference :  http://schier.co/blog/2015/04/26/a-
 }
 
 func main() {
-	findLinks("http://www.cise.ufl.edu/class/cis4930fa15idm/notes.html")
-	//findLinks("https://www.reddit.com/r/aww")
+	//extension := "pdf"
+	//findFiles("http://www.cise.ufl.edu/class/cis4930fa15idm/notes.html", extension)
+	findFiles("https://www.reddit.com/r/aww", "jpg")
 }
