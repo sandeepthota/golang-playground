@@ -5,7 +5,7 @@ File Downloader : Given link to a webpage and file type, this program will downl
 Running Instructions :
 Run go get golang.org/x/net/html on command prompt first to get html package. The program takes url and file extension as command line arguments. So, to get all jpg files from https://www.reddit.com/r/pics you would type in go run fileDownloader.go https://www.reddit.com/r/pics jpg
 
-Sample Output :
+Sample Output : http://showterm.io/500cb9fee78a64d7f09e4
 
 */
 

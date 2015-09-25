@@ -1,5 +1,4 @@
 /*
-
 File Downloader : Given link to a webpage and file type, this program will download all files of those extension(if any) present on the webpage. For each link found containing file of desired extension, a go routine is fired. This will ensure maximum throughput since some of the files found might be present on a slower server while others might be present on a faster server.
 
 Running Instructions :
